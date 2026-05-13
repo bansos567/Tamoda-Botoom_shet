@@ -1,0 +1,39 @@
+name: Build Extension with Ant
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: # Supaya bisa di-klik jalan manual (Run workflow)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Mengambil kode dari repository bos
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    # 2. Menyiapkan Java (JDK 8 paling aman & stabil untuk ekstensi Kodular)
+    - name: Set up JDK 8
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+
+    # 3. Menginstall Apache Ant
+    - name: Setup Apache Ant
+      run: |
+        sudo apt-get update
+        sudo apt-get install ant -y
+
+    # 4. Mengeksekusi perintah build (Pastikan build.xml ada di root)
+    - name: Compile Extension
+      run: ant extensions
+
+    # 5. Menyimpan hasil file .aix agar bisa di-download
+    - name: Upload AIX Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Hasil-Ekstensi-Tamoda
+        path: out/*.aix  # Ganti "out" dengan nama folder output di repo bos jika berbeda
